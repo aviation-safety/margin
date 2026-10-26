@@ -630,7 +630,7 @@ a[href="#article-b-mvornl6q-xwqbur"] img{object-fit:contain!important;background
       </div>
       <div class="side-box">
         <h4>나의 읽기 현황</h4>
-        <div class="ring-wrap"><svg class="ring" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="15.9" class="r-bg"/><circle cx="18" cy="18" r="15.9" class="r-fg"/></svg><div class="ring-num"><b class="rn">0</b>/8</div></div>
+        <div class="ring-wrap"><svg class="ring" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="15.9" class="r-bg"/><circle cx="18" cy="18" r="15.9" class="r-fg"/></svg><div class="ring-num"><b class="rn">0</b>/6</div></div>
         <p class="side-note">다 읽으면 작은 축하가 기다리고 있어요 ✈️</p>
       </div>
       <div class="side-box event">
@@ -1523,13 +1523,14 @@ function prepReveal(post){
 
 /* ---- personal reading progress (this browser only) ---- */
 const read=new Set(store.get('read',[]));
+const ARTICLES=META.posts.filter(p=>p.cat!=='with');
 function paintRead(){
-  const n=META.posts.filter(p=>read.has(p.id)).length,N=META.posts.length;
+  const n=ARTICLES.filter(p=>read.has(p.id)).length,N=ARTICLES.length;
   $$('[data-card]').forEach(c=>c.classList.toggle('is-read',read.has(c.dataset.card)));
   $$('.st-title').forEach(a=>a.classList.toggle('is-read',read.has(a.getAttribute('href').slice(1))));
   const pct=Math.round(n/N*100);
   $('.tr-bar i').style.width=pct+'%';
-  const next=META.posts.find(p=>!read.has(p.id));
+  const next=ARTICLES.find(p=>!read.has(p.id));
   const tr=$('.tr-text');tr.replaceChildren();
   if(n===0)tr.textContent='아직 읽은 글이 없어요. 첫 글부터 가볍게 시작해 볼까요?';
   else if(n===N)tr.textContent='🎉 이번 호를 모두 읽으셨어요!';
@@ -1539,7 +1540,7 @@ function paintRead(){
 function markRead(id){
   if(!META.posts.some(p=>p.id===id)||read.has(id))return;
   read.add(id);store.set('read',[...read]);paintRead();
-  if(read.size>=META.posts.length&&!store.get('celebrated',false)){store.set('celebrated',true);celebrate()}
+  if(ARTICLES.every(p=>read.has(p.id))&&!store.get('celebrated',false)){store.set('celebrated',true);celebrate()}
 }
 function celebrate(){
   $('.celebrate').hidden=false;
